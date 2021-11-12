@@ -626,5 +626,26 @@ namespace CMF
 			else
 				momentum = _newMomentum;
 		}
+
+		private void OnTriggerEnter(Collider other)
+		{
+			if(other.tag == "Player")
+			{
+				other.tag = "Untagged";
+				other.isTrigger = false;
+
+				GameObject hit = other.gameObject;
+				Rigidbody rb = hit.AddComponent(typeof(Rigidbody)) as Rigidbody;
+				rb.mass = 2;
+
+				testScript sc = hit.GetComponent<testScript>();
+
+				if (sc != null)
+				{
+					sc.stunned = true;
+					sc.isTag = true;
+				}
+			}
+		}
 	}
 }
