@@ -41,7 +41,8 @@ namespace CMF
 			fpsCounter = GetComponent<FPSCounter>();
 
 			//Hide menu;
-			SetMenuEnabled(false);
+			demoMenuObject.SetActive(false);
+			//SetMenuEnabled(false);
 
 			//Enable/Disable shadows based on last player selection;
 			disableShadows.SetShadows(PlayerData.enableShadows);
@@ -93,8 +94,8 @@ namespace CMF
 			#endif
 
 			//If left mouse button is pressed and the menu is hidden, lock cursor;
-			if(Input.GetMouseButtonDown(0) && !demoMenuObject.activeSelf)
-				Cursor.lockState = CursorLockMode.Locked;
+			//if(Input.GetMouseButtonDown(0) && !demoMenuObject.activeSelf)
+			//	Cursor.lockState = CursorLockMode.Locked;
 		}
 
 		//Reload scene;
