@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 
 namespace CMF
 {
 	//This script moves a rigidbody along a set of waypoints;
 	//It also moves any controllers on top along with it;
-	public class MovingPlatform : MonoBehaviour {
+	public class MovingPlatform : NetworkBehaviour {
 
 		//Movement speed;
 		public float movementSpeed = 10f;
@@ -28,6 +29,9 @@ namespace CMF
 		public List<Transform> waypoints = new List<Transform>();
 		int currentWaypointIndex = 0;
 		Transform currentWaypoint;
+
+		//Network variables
+		NetworkVariable<Vector3> m_networkPosition = new NetworkVariable<Vector3>();
 
 		//Start;
 		void Start () {
@@ -66,44 +70,52 @@ namespace CMF
 		}
 
 		void MovePlatform () {
+			if (IsHost)
+            {
+				//If no waypoints have been assigned, return;
+				if(waypoints.Count <= 0)
+					return;
 
-			//If no waypoints have been assigned, return;
-			if(waypoints.Count <= 0)
-				return;
+				if(isWaiting)
+					return;
 
-			if(isWaiting)
-				return;
+				//Calculate a vector to the current waypoint;
+				Vector3 _toCurrentWaypoint = currentWaypoint.position - transform.position;
 
-			//Calculate a vector to the current waypoint;
-			Vector3 _toCurrentWaypoint = currentWaypoint.position - transform.position;
+				//Get normalized movement direction;
+				Vector3 _movement = _toCurrentWaypoint.normalized;
 
-			//Get normalized movement direction;
-			Vector3 _movement = _toCurrentWaypoint.normalized;
+				//Get movement for this frame;
+				_movement *= movementSpeed * Time.deltaTime;
 
-			//Get movement for this frame;
-			_movement *= movementSpeed * Time.deltaTime;
+				//If the remaining distance to the next waypoint is smaller than this frame's movement, move directly to next waypoint;
+				//Else, move toward next waypoint;
+				if(_movement.magnitude >= _toCurrentWaypoint.magnitude || _movement.magnitude == 0f)
+				{
+					r.transform.position = currentWaypoint.position;
+					UpdateWaypoint();
+				}
+				else
+				{
+					r.transform.position += _movement;
+				}
 
-			//If the remaining distance to the next waypoint is smaller than this frame's movement, move directly to next waypoint;
-			//Else, move toward next waypoint;
-			if(_movement.magnitude >= _toCurrentWaypoint.magnitude || _movement.magnitude == 0f)
-			{
-				r.transform.position = currentWaypoint.position;
-				UpdateWaypoint();
-			}
+				if(triggerArea == null)
+					return;
+
+				//Move all controllrs on top of the platform the same distance;
+
+				for(int i = 0; i < triggerArea.rigidbodiesInTriggerArea.Count; i++) 
+				{
+					triggerArea.rigidbodiesInTriggerArea[i].MovePosition(triggerArea.rigidbodiesInTriggerArea[i].position + _movement);
+				}
+
+				m_networkPosition.Value = r.transform.position;
+            }
 			else
-			{
-				r.transform.position += _movement;
-			}
-
-			if(triggerArea == null)
-				return;
-
-			//Move all controllrs on top of the platform the same distance;
-
-			for(int i = 0; i < triggerArea.rigidbodiesInTriggerArea.Count; i++) 
-			{
-				triggerArea.rigidbodiesInTriggerArea[i].MovePosition(triggerArea.rigidbodiesInTriggerArea[i].position + _movement);
-			}
+            {
+				r.transform.position = m_networkPosition.Value;
+            }
 		}
 
 		//This function is called after the current waypoint has been reached;

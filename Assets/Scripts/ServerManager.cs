@@ -8,6 +8,8 @@ public class ServerManager : MonoBehaviour
     public GameObject m_serverButtons;
     private bool m_modeSelected = false;
 
+    public EnvironmentSpawner m_environmentSpawner;
+
     void OnGUI()
     {
         GUILayout.BeginArea(new Rect(50, 50, 800, 1600));
@@ -26,6 +28,8 @@ public class ServerManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         m_serverButtons.SetActive(false);
         NetworkManager.Singleton.StartHost();
+
+        m_environmentSpawner.InitializeEnvironmentClientRpc();
     }
 
     public void StartClient()
@@ -34,6 +38,8 @@ public class ServerManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         m_serverButtons.SetActive(false);
         NetworkManager.Singleton.StartClient();
+
+        m_environmentSpawner.InitializeEnvironmentClientRpc();
     }
 
     static void StatusLabels()
