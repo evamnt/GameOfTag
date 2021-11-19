@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace CMF
 {
@@ -19,18 +20,31 @@ namespace CMF
         //Use this to prevent any unwanted small movements of the joysticks ("jitter");
 		public float deadZoneThreshold = 0.2f;
 
-        public override float GetHorizontalMovementInput()
+		NetworkVariable<float> m_horizontalInput = new NetworkVariable<float>();
+		NetworkVariable<float> m_verticalInput = new NetworkVariable<float>();
+		NetworkVariable<bool> m_jumpInput = new NetworkVariable<bool>();
+
+		public override float GetHorizontalMovementInput()
 		{
 			float _horizontalInput;
 
-			if(useRawInput)
-				_horizontalInput = Input.GetAxisRaw(horizontalInputAxis);
-			else
-				_horizontalInput = Input.GetAxis(horizontalInputAxis);
+			if (IsLocalPlayer)
+            {
+				if (useRawInput)
+					_horizontalInput = Input.GetAxisRaw(horizontalInputAxis);
+				else
+					_horizontalInput = Input.GetAxis(horizontalInputAxis);
 
-			//Set any input values below threshold to '0';
-			if(Mathf.Abs(_horizontalInput) < deadZoneThreshold)
-				_horizontalInput = 0f;
+				//Set any input values below threshold to '0';
+				if (Mathf.Abs(_horizontalInput) < deadZoneThreshold)
+					_horizontalInput = 0f;
+
+				m_horizontalInput.Value = _horizontalInput;
+			}
+			else
+            {
+				_horizontalInput = m_horizontalInput.Value;
+            }
 
 			return _horizontalInput;
 		}
@@ -39,21 +53,38 @@ namespace CMF
 		{
 			float _verticalInput;
 
-			if(useRawInput)
-				_verticalInput = Input.GetAxisRaw(verticalInputAxis);
-			else
-				_verticalInput = Input.GetAxis(verticalInputAxis);
+			if (IsLocalPlayer)
+            {
+				if (useRawInput)
+					_verticalInput = Input.GetAxisRaw(verticalInputAxis);
+				else
+					_verticalInput = Input.GetAxis(verticalInputAxis);
 
-			//Set any input values below threshold to '0';
-			if(Mathf.Abs(_verticalInput) < deadZoneThreshold)
-				_verticalInput = 0f;
+				//Set any input values below threshold to '0';
+				if (Mathf.Abs(_verticalInput) < deadZoneThreshold)
+					_verticalInput = 0f;
+
+				m_verticalInput.Value = _verticalInput;
+			}
+			else
+            {
+				_verticalInput = m_verticalInput.Value;
+            }
 
 			return _verticalInput;
 		}
 
 		public override bool IsJumpKeyPressed()
 		{
-			return Input.GetKey(jumpKey);
+			if (IsLocalPlayer)
+            {
+				m_jumpInput.Value = Input.GetKey(jumpKey);
+				return Input.GetKey(jumpKey);
+			}
+			else
+            {
+				return m_jumpInput.Value;
+            }
 		}
 
 	}
