@@ -31,7 +31,8 @@ namespace CMF
 		Transform currentWaypoint;
 
 		//Network variables
-		NetworkVariable<Vector3> m_networkPosition = new NetworkVariable<Vector3>();
+		NetworkVariable<Vector3> m_networkMovement = new NetworkVariable<Vector3>();
+        NetworkVariable<Vector3> m_networkCurrentWaypoint = new NetworkVariable<Vector3>();
 
 		//Start;
 		void Start () {
@@ -70,6 +71,18 @@ namespace CMF
 		}
 
 		void MovePlatform () {
+
+			Vector3 _toCurrentWaypoint;
+			Vector3 _movement;
+
+			if (!IsHost)
+            {
+				currentWaypoint.position = m_networkCurrentWaypoint.Value;
+            }
+
+			//Calculate a vector to the current waypoint;
+			_toCurrentWaypoint = currentWaypoint.position - transform.position;
+
 			if (IsHost)
             {
 				//If no waypoints have been assigned, return;
@@ -79,43 +92,41 @@ namespace CMF
 				if(isWaiting)
 					return;
 
-				//Calculate a vector to the current waypoint;
-				Vector3 _toCurrentWaypoint = currentWaypoint.position - transform.position;
-
 				//Get normalized movement direction;
-				Vector3 _movement = _toCurrentWaypoint.normalized;
+				_movement = _toCurrentWaypoint.normalized;
 
 				//Get movement for this frame;
 				_movement *= movementSpeed * Time.deltaTime;
 
-				//If the remaining distance to the next waypoint is smaller than this frame's movement, move directly to next waypoint;
-				//Else, move toward next waypoint;
-				if(_movement.magnitude >= _toCurrentWaypoint.magnitude || _movement.magnitude == 0f)
-				{
-					r.transform.position = currentWaypoint.position;
-					UpdateWaypoint();
-				}
-				else
-				{
-					r.transform.position += _movement;
-				}
-
-				if(triggerArea == null)
-					return;
-
-				//Move all controllrs on top of the platform the same distance;
-
-				for(int i = 0; i < triggerArea.rigidbodiesInTriggerArea.Count; i++) 
-				{
-					triggerArea.rigidbodiesInTriggerArea[i].MovePosition(triggerArea.rigidbodiesInTriggerArea[i].position + _movement);
-				}
-
-				m_networkPosition.Value = r.transform.position;
+				m_networkMovement.Value = _movement;
             }
 			else
             {
-				r.transform.position = m_networkPosition.Value;
+				_movement = m_networkMovement.Value;
             }
+
+			//If the remaining distance to the next waypoint is smaller than this frame's movement, move directly to next waypoint;
+			//Else, move toward next waypoint;
+			if (_movement.magnitude >= _toCurrentWaypoint.magnitude || _movement.magnitude == 0f)
+			{
+				r.transform.position = currentWaypoint.position;
+				if (IsHost)
+					UpdateWaypoint();
+			}
+			else
+			{
+				r.transform.position += _movement;
+			}
+
+			if (triggerArea == null)
+				return;
+
+			//Move all controllrs on top of the platform the same distance;
+
+			for (int i = 0; i < triggerArea.rigidbodiesInTriggerArea.Count; i++)
+			{
+				triggerArea.rigidbodiesInTriggerArea[i].MovePosition(triggerArea.rigidbodiesInTriggerArea[i].position + _movement);
+			}
 		}
 
 		//This function is called after the current waypoint has been reached;
@@ -138,6 +149,8 @@ namespace CMF
 
 			//Stop platform movement;
 			isWaiting = true;
+
+			m_networkCurrentWaypoint.Value = currentWaypoint.position;
 		}
 
 		//Coroutine that keeps track of the wait time and sets 'isWaiting' back to 'false', after 'waitTime' has passed;

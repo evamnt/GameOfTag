@@ -204,6 +204,7 @@ namespace CMF
 		}
 
 		NetworkVariable<Vector3> m_networkVelocity = new NetworkVariable<Vector3>();
+		NetworkVariable<Vector3> m_networkPosition = new NetworkVariable<Vector3>();
 
 		//Calculate and return movement velocity based on player input, controller state, ground normal [...];
 		protected virtual Vector3 CalculateMovementVelocity()
@@ -217,10 +218,11 @@ namespace CMF
 				//Multiply (normalized) velocity with movement speed;
 				_velocity *= movementSpeed;
 
-				UpdateRemoteVelocityServerRpc(_velocity);
+				UpdateRemoteVelocityAndPositionServerRpc(_velocity, transform.position);
             }
 			else
             {
+				transform.position = m_networkPosition.Value;
 				_velocity = m_networkVelocity.Value;
             }
 
@@ -228,9 +230,10 @@ namespace CMF
 		}
 
 		[ServerRpc]
-		void UpdateRemoteVelocityServerRpc(Vector3 newVelocity)
+		void UpdateRemoteVelocityAndPositionServerRpc(Vector3 newVelocity, Vector3 newPosition)
         {
 			m_networkVelocity.Value = newVelocity;
+			m_networkPosition.Value = newPosition;
 		}
 
 		//Returns 'true' if the player presses the jump key;
