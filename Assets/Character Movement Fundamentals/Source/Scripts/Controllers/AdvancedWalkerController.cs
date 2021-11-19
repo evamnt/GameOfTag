@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace CMF
 {
@@ -202,16 +203,34 @@ namespace CMF
 			return _velocity;
 		}
 
+		NetworkVariable<Vector3> m_networkVelocity = new NetworkVariable<Vector3>();
+
 		//Calculate and return movement velocity based on player input, controller state, ground normal [...];
 		protected virtual Vector3 CalculateMovementVelocity()
 		{
-			//Calculate (normalized) movement direction;
-			Vector3 _velocity = CalculateMovementDirection();
+			Vector3 _velocity;
+			if (IsLocalPlayer)
+            {
+				//Calculate (normalized) movement direction;
+				_velocity = CalculateMovementDirection();
 
-			//Multiply (normalized) velocity with movement speed;
-			_velocity *= movementSpeed;
+				//Multiply (normalized) velocity with movement speed;
+				_velocity *= movementSpeed;
+
+				UpdateRemoteVelocityServerRpc(_velocity);
+            }
+			else
+            {
+				_velocity = m_networkVelocity.Value;
+            }
 
 			return _velocity;
+		}
+
+		[ServerRpc]
+		void UpdateRemoteVelocityServerRpc(Vector3 newVelocity)
+        {
+			m_networkVelocity.Value = newVelocity;
 		}
 
 		//Returns 'true' if the player presses the jump key;
