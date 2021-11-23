@@ -8,7 +8,21 @@ public class ServerManager : MonoBehaviour
     public GameObject m_serverButtons;
     private bool m_modeSelected = false;
 
+    private List<GameObject> m_connectedPlayers = new List<GameObject>();
+    public Transform m_spawnPositions;
+    private List<Transform> m_spawnPositionsList = new List<Transform>();
+    private List<int> m_freeSpawnPoints = new List<int>();
+
     public EnvironmentSpawner m_environmentSpawner;
+
+    private void Start()
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            m_spawnPositionsList.Add(m_spawnPositions.GetChild(i));
+            m_freeSpawnPoints.Add(i);
+        }
+    }
 
     void OnGUI()
     {
@@ -27,6 +41,9 @@ public class ServerManager : MonoBehaviour
         m_modeSelected = true;
         Cursor.lockState = CursorLockMode.Locked;
         m_serverButtons.SetActive(false);
+
+        NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
+
         NetworkManager.Singleton.StartHost();
 
         m_environmentSpawner.InitializeEnvironmentClientRpc();
@@ -37,6 +54,10 @@ public class ServerManager : MonoBehaviour
         m_modeSelected = true;
         Cursor.lockState = CursorLockMode.Locked;
         m_serverButtons.SetActive(false);
+
+        //If we want to request a password
+        //NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("room password");
+
         NetworkManager.Singleton.StartClient();
 
         m_environmentSpawner.InitializeEnvironmentClientRpc();
@@ -52,13 +73,27 @@ public class ServerManager : MonoBehaviour
         GUILayout.Label("Mode: " + mode);
     }
 
-    //static void SubmitNewPosition()
-    //{
-    //    if (GUILayout.Button(NetworkManager.Singleton.IsServer ? "Move" : "Request Position Change"))
-    //    {
-    //        var playerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
-    //        //var player = playerObject.GetComponent<HelloWorldPlayer>();
-    //        //player.Move();
-    //    }
-    //}
+    private void ApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
+    {
+        Debug.Log("Entered approval check");
+
+        if (m_connectedPlayers.Count >= 6)
+        {
+            Debug.Log("Limit of players reached");
+            //If approve is true, the connection gets added. If it's false. The client gets disconnected
+            callback(false, null, false, Vector3.zero, Quaternion.identity);
+        }
+        else
+        {
+            Debug.Log("Player approved");
+            int index = Random.Range(0, m_freeSpawnPoints.Count);
+            Transform spawnPosition = m_spawnPositionsList[m_freeSpawnPoints[index]];
+            m_freeSpawnPoints.RemoveAt(index);
+            Debug.Log("Position attributed : " + spawnPosition.position);
+            //If approve is true, the connection gets added. If it's false. The client gets disconnected
+            callback(true, null, true, spawnPosition.position, spawnPosition.rotation);
+
+            m_connectedPlayers.Add(NetworkManager.Singleton.ConnectedClientsList[NetworkManager.Singleton.ConnectedClientsList.Count - 1].PlayerObject.gameObject);
+        }
+    }
 }
