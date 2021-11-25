@@ -108,7 +108,15 @@ namespace CMF
 		public void QuitGame()
 		{
 			Application.Quit();
-		}	
+		}
+		
+		//----------NOT FROM ORIGINAL CODE----------------------
+		
+		[ServerRPC]
+
+
+		// ------------------------------------------------------
+
 
 		//This event is called whenever a new controller preset is chosen in the menu;
 		public void OnControllerPresetChosen(int _presetIndex)

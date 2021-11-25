@@ -14,6 +14,7 @@ public class ServerManager : MonoBehaviour
     private List<int> m_freeSpawnPoints = new List<int>();
 
     public EnvironmentSpawner m_environmentSpawner;
+    public CatManager m_catManager;
 
     private void Start()
     {
@@ -94,6 +95,15 @@ public class ServerManager : MonoBehaviour
             callback(true, null, true, spawnPosition.position, spawnPosition.rotation);
 
             m_connectedPlayers.Add(NetworkManager.Singleton.ConnectedClientsList[NetworkManager.Singleton.ConnectedClientsList.Count - 1].PlayerObject.gameObject);
+            m_catManager.UpdatePlayerList(m_connectedPlayers);
         }
     }
+    
+    // Select a random player from the list that will become the cat for the beginning of the game
+    public void SelectRandomCat()
+    {
+        int index = Random.Range(0, m_connectedPlayers.Count);
+        m_catManager.SetPlayerAsCat(m_connectedPlayers[index]);
+    }
 }
+

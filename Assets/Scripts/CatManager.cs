@@ -7,5 +7,14 @@ public class CatManager : NetworkBehaviour
 {
     private List<GameObject> m_connectedPlayers;
 
+    public void UpdatePlayerList(List<GameObject> playerList)
+    {
+        m_connectedPlayers = playerList;
+    }
+
+    public void SetPlayerAsCat(GameObject catPlayer)
+    {
+        catPlayer.GetComponent<CatTimer>().SetPlayerStatus(true);
+    }
 
 }
