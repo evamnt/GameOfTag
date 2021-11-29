@@ -3,17 +3,34 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class Gamerules : NetworkBehaviour
+public class Gamerules : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    List<PlayerInfos> m_allPlayersInfos = new List<PlayerInfos>();
+
+    public void RemovePlayer(ulong clientId)
     {
-        
+        for (int index = 0; index < m_allPlayersInfos.Count; index++)
+        {
+            if (m_allPlayersInfos[index].clientId == clientId)
+            {
+                m_allPlayersInfos.RemoveAt(index);
+                break;
+            }
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void AddClient(ulong clientId, string nickname)
     {
-        
+        m_allPlayersInfos.Add(new PlayerInfos(clientId, nickname));
     }
+
+    public int GetPlayersNb()
+    {
+        return m_allPlayersInfos.Count;
+    }
+
+    public List<PlayerInfos> GetAllConnectedPlayers()
+    {
+        return m_allPlayersInfos;
+    } 
 }

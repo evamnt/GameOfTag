@@ -3,34 +3,55 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using TMPro;
+using System;
 
 public class ServerManager : NetworkBehaviour
 {
-    [Header("UIs")]
+    [Header("Generic UIs")]
     public GameObject m_chooseModeUI;
-    public GameObject m_startGameUI;
+
+    [Header("Server UIs")]
+    public GameObject m_serverUI;
     public GameObject m_connectedPlayersUI;
+
+    [Header("Client UIs")]
+    public GameObject m_clientUI;
 
     [Header("Texts")]
     public GameObject m_warningName;
     public TMP_Text m_name;
-    
+
     [Header("Games Infos")]
     public Transform m_spawnPositions;
     public EnvironmentSpawner m_environmentSpawner;
     public CatManager m_catManager;
 
-    private List<TMP_Text> m_connectedPlayersTextBoxes = new List<TMP_Text>();
-    private TMP_Text m_playersNb;
+    [Header("Prefabs")]
+    //Only used by the server
+    public GameObject m_gamerulesPrefab;
+    private Gamerules m_gamerules;
 
-    private Dictionary<ulong, GameObject> m_connectedPlayers = new Dictionary<ulong, GameObject>();
-    private Dictionary<ulong, string> m_connectedPlayersNames = new Dictionary<ulong, string>();
     private List<Transform> m_spawnPositionsList = new List<Transform>();
     private List<int> m_freeSpawnPoints = new List<int>();
+    private bool m_creatingHost;
+    private bool m_gameStarted = false;
+
+    private List<TMP_Text> m_connectedPlayersTextBoxes = new List<TMP_Text>();
+    private TMP_Text m_playersNb;
+    private List<PlayerInfos> m_connectedPlayers = new List<PlayerInfos>();
+
+    public bool GameStarted
+    {
+        get { return m_gameStarted; }
+        private set { m_gameStarted = value; }
+    }
 
     private void Start()
     {
         m_warningName.SetActive(false);
+        m_chooseModeUI.SetActive(true);
+        m_serverUI.SetActive(false);
+        m_clientUI.SetActive(false);
         for (int i = 0; i < 6; i++)
         {
             m_spawnPositionsList.Add(m_spawnPositions.GetChild(i));
@@ -39,41 +60,12 @@ public class ServerManager : NetworkBehaviour
 
         for (int i = 1; i < 7; i++)
         {
-            m_connectedPlayersTextBoxes.Add(m_connectedPlayersUI.transform.GetChild(i).GetComponent<TMP_Text>());
-            m_connectedPlayersTextBoxes[m_connectedPlayersTextBoxes.Count - 1].text = "";
+            TMP_Text currentText = m_connectedPlayersUI.transform.GetChild(i).GetComponent<TMP_Text>();
+            currentText.text = "";
+            m_connectedPlayersTextBoxes.Add(currentText);
         }
         m_playersNb = m_connectedPlayersUI.transform.GetChild(7).GetComponent<TMP_Text>();
-        m_playersNb.text = "";
-    }
-
-    private void RefreshConnectedPlayersUI()
-    {
-        ResetPlayerNameUIClientRpc();
-        int i = 0;
-        foreach (string name in m_connectedPlayersNames.Values)
-        {
-            AddPlayerNameToUIClientRpc(name, i);
-            i++;
-        }
-    }
-
-    [ClientRpc]
-    void ResetPlayerNameUIClientRpc()
-    {
-        int i = 0;
-        foreach (string name in m_connectedPlayersNames.Values)
-        {
-            m_connectedPlayersTextBoxes[i].text = "";
-            i++;
-        }
-        m_playersNb.text = "0 / 6";
-    }
-
-    [ClientRpc]
-    void AddPlayerNameToUIClientRpc(string playerName, int i)
-    {
-        m_connectedPlayersTextBoxes[i].text = "- " + playerName;
-        m_playersNb.text = i + 1 + " / 6";
+        m_playersNb.text = "0 / " + m_connectedPlayersTextBoxes.Count;
     }
 
     private bool CheckNickname()
@@ -89,18 +81,37 @@ public class ServerManager : NetworkBehaviour
         }
     }
 
+    private void UpdateConnectedPlayersUI()
+    {
+        m_connectedPlayers = m_gamerules.GetAllConnectedPlayers();
+        int clientNum;
+        for (clientNum = 0; clientNum < m_connectedPlayers.Count; clientNum++)
+        {
+            m_connectedPlayersTextBoxes[clientNum].text = "- " + m_connectedPlayers[clientNum].nickname;
+        }
+        for (int clientToReset = clientNum; clientToReset < m_connectedPlayersTextBoxes.Count; clientToReset++)
+        {
+            m_connectedPlayersTextBoxes[clientToReset].text = "";
+        }
+
+        m_playersNb.text = clientNum + " / " + m_connectedPlayersTextBoxes.Count;
+    }
+
     public void ButtonHost()
     {
         if (CheckNickname())
         {
-            m_chooseModeUI.SetActive(false);
-            m_connectedPlayersUI.SetActive(true);
-            m_startGameUI.SetActive(true);
             NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(m_name.text);
-            if (NetworkManager.Singleton.StartHost()) 
+            NetworkManager.Singleton.OnClientDisconnectCallback += DisconnectionCallback;
+            m_creatingHost = true;
+            if (NetworkManager.Singleton.StartHost())
             {
-                RefreshConnectedPlayersUI();
+                m_chooseModeUI.SetActive(false);
+                m_serverUI.SetActive(true);
+
+                //We have instantiated the host, now we wait for clients
+                m_creatingHost = false;
             }
         }
     }
@@ -109,15 +120,23 @@ public class ServerManager : NetworkBehaviour
     {
         if (CheckNickname())
         {
-            m_chooseModeUI.SetActive(false);
-            m_connectedPlayersUI.SetActive(true);
-            //If we want to request a password
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(m_name.text);
+            m_creatingHost = false;
             if (NetworkManager.Singleton.StartClient())
             {
-                RefreshConnectedPlayersUI();
+                
+                {
+                    m_chooseModeUI.SetActive(false);
+                    m_clientUI.SetActive(true);
+                }
             }
         }
+        
+    }
+
+    public void Disconnect()
+    {
+        NetworkManager.Singleton.DisconnectClient(NetworkManager.Singleton.LocalClientId);
     }
 
     public void StartHost()
@@ -146,9 +165,20 @@ public class ServerManager : NetworkBehaviour
 
     private void ApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
     {
-        Debug.Log("Entered approval check");
+        if (m_creatingHost)
+        {
+            //If approve is true, the connection gets added. If it's false. The client gets disconnected
+            callback(false, null, true, Vector3.zero, Quaternion.identity);
 
-        if (m_connectedPlayers.Count >= 6)
+            string connectedPlayerName = System.Text.Encoding.ASCII.GetString(connectionData);
+
+            GameObject instantiatedGamerule = Instantiate(m_gamerulesPrefab);
+            m_gamerules = instantiatedGamerule.GetComponent<Gamerules>();
+
+            m_gamerules.AddClient(clientId, connectedPlayerName);
+            UpdateConnectedPlayersUI();
+        }
+        else if (m_gamerules.GetPlayersNb() >= 2)
         {
             Debug.Log("Limit of players reached");
             //If approve is true, the connection gets added. If it's false. The client gets disconnected
@@ -160,11 +190,19 @@ public class ServerManager : NetworkBehaviour
             callback(false, null, true, Vector3.zero, Quaternion.identity);
 
             string connectedPlayerName = System.Text.Encoding.ASCII.GetString(connectionData);
-            m_connectedPlayers.Add(clientId, null);
-            m_connectedPlayersNames.Add(clientId, connectedPlayerName);
+
+            m_gamerules.AddClient(clientId, connectedPlayerName);
+            UpdateConnectedPlayersUI();
         }
     }
     
+    private void DisconnectionCallback(ulong clientId)
+    {
+        m_gamerules.RemovePlayer(clientId);
+        m_connectedPlayers = m_gamerules.GetAllConnectedPlayers();
+        UpdateConnectedPlayersUI();
+    }
+
     // Select a random player from the list that will become the cat for the beginning of the game
     public void SelectRandomCat()
     {

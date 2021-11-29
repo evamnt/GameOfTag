@@ -10,7 +10,7 @@ namespace CMF
 	public class DemoMenu : MonoBehaviour {
 
 		//The menu is shown/hidden using this key;
-		public KeyCode menuKey = KeyCode.C;
+		public KeyCode menuKey = KeyCode.M;
 
 		//References to secondary components;
 		DisableShadows disableShadows;
@@ -34,6 +34,7 @@ namespace CMF
 		//Color of currently selected controller prefab button;
 		public Color activeButtonColor = Color.cyan;
 
+		public ServerManager m_serverManager;
 		void Start () {
 
 			//Get references;
@@ -79,23 +80,26 @@ namespace CMF
 		// Update is called once per frame
 		void Update () {
 
-			//Hide/show demo menu;
-			if(Input.GetKeyDown(menuKey))
-			{
-				SetMenuEnabled(!demoMenuObject.activeSelf);
-			}
+			if (m_serverManager.GameStarted)
+            {
+				//Hide/show demo menu;
+				if (Input.GetKeyDown(menuKey))
+				{
+					SetMenuEnabled(!demoMenuObject.activeSelf);
+				}
 
-			//If scene was built as a Windows executable, also hide/show demo menu when 'Escape' is pressed;
-			#if UNITY_STANDALONE_WIN
-			if(Input.GetKeyDown(KeyCode.Escape))
-			{
-				SetMenuEnabled(!demoMenuObject.activeSelf);
-			}
-			#endif
+				//If scene was built as a Windows executable, also hide/show demo menu when 'Escape' is pressed;
+				#if UNITY_STANDALONE_WIN
+				if (Input.GetKeyDown(KeyCode.Escape))
+				{
+					SetMenuEnabled(!demoMenuObject.activeSelf);
+				}
+				#endif
 
-			//If left mouse button is pressed and the menu is hidden, lock cursor;
-			//if(Input.GetMouseButtonDown(0) && !demoMenuObject.activeSelf)
-			//	Cursor.lockState = CursorLockMode.Locked;
+				//If left mouse button is pressed and the menu is hidden, lock cursor;
+				//if(Input.GetMouseButtonDown(0) && !demoMenuObject.activeSelf)
+				//	Cursor.lockState = CursorLockMode.Locked;
+			}
 		}
 
 		//Reload scene;
