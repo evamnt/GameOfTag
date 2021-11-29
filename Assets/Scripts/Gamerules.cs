@@ -33,4 +33,11 @@ public class Gamerules : MonoBehaviour
     {
         return m_allPlayersInfos;
     } 
+
+    public void AssociatePlayerWithGameObject(ulong clientId, GameObject instantiatedPlayer)
+    {
+        int playerIndex = m_allPlayersInfos.FindIndex(p => p.clientId == clientId);
+        PlayerInfos oldInfos = m_allPlayersInfos[playerIndex];
+        m_allPlayersInfos[playerIndex] = new PlayerInfos(oldInfos.clientId, oldInfos.nickname, instantiatedPlayer);
+    }
 }

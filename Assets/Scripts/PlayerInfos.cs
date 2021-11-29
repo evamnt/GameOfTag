@@ -5,20 +5,22 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using Unity.Collections;
 
-public struct PlayerInfos : INetworkSerializable
+public struct PlayerInfos
 {
     //Variable declaration
     public ulong clientId;
-    public FixedString64Bytes nickname;
+    public string nickname;
     public bool exists;
+    public GameObject instantiatedPlayer;
 
     //public GameObject instantiatedPlayer;
 
     //Constructor
-    public PlayerInfos(ulong clientId = 0, string nickname = "")
+    public PlayerInfos(ulong clientId = 0, string nickname = "", GameObject instantiatedPlayer = null)
     {
         this.clientId = clientId;
-        this.nickname = new FixedString64Bytes(nickname);
+        this.nickname = nickname;
+        this.instantiatedPlayer = instantiatedPlayer;
         
         if (clientId != 0)
         {
@@ -28,11 +30,5 @@ public struct PlayerInfos : INetworkSerializable
         {
             exists = false;
         }
-    }
-
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref clientId);
-        serializer.SerializeValue(ref nickname);
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using TMPro;
-using System;
 
 public class ServerManager : NetworkBehaviour
 {
@@ -17,6 +16,9 @@ public class ServerManager : NetworkBehaviour
     [Header("Client UIs")]
     public GameObject m_clientUI;
 
+    [Header("Prefabs")]
+    public GameObject m_playerPrefab;
+
     [Header("Texts")]
     public GameObject m_warningName;
     public TMP_Text m_name;
@@ -24,12 +26,13 @@ public class ServerManager : NetworkBehaviour
     [Header("Games Infos")]
     public Transform m_spawnPositions;
     public EnvironmentSpawner m_environmentSpawner;
-    public CatManager m_catManager;
 
     [Header("Prefabs")]
     //Only used by the server
     public GameObject m_gamerulesPrefab;
     private Gamerules m_gamerules;
+    public GameObject m_catManagerPrefab;
+    private CatManager m_catManager;
 
     private List<Transform> m_spawnPositionsList = new List<Transform>();
     private List<int> m_freeSpawnPoints = new List<int>();
@@ -43,7 +46,7 @@ public class ServerManager : NetworkBehaviour
     public bool GameStarted
     {
         get { return m_gameStarted; }
-        private set { m_gameStarted = value; }
+        set { m_gameStarted = value; }
     }
 
     private void Start()
@@ -139,18 +142,27 @@ public class ServerManager : NetworkBehaviour
         NetworkManager.Singleton.DisconnectClient(NetworkManager.Singleton.LocalClientId);
     }
 
-    public void StartHost()
+    public void ButtonStartGame()
     {
         Cursor.lockState = CursorLockMode.Locked;
 
-        m_environmentSpawner.InitializeEnvironmentClientRpc();
-    }
+        for(int i = 0; i < m_connectedPlayers.Count; i++)
+        {
+            int positionIndex = Random.Range(0, m_freeSpawnPoints.Count);
+            Transform currentPlayerPosition = m_spawnPositionsList[m_freeSpawnPoints[positionIndex]];
+            m_freeSpawnPoints.RemoveAt(positionIndex);
+            GameObject instantiatedPlayer = Instantiate(m_playerPrefab, currentPlayerPosition.position, currentPlayerPosition.rotation);
+            instantiatedPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(m_connectedPlayers[i].clientId);
+            //Give the instantiated player its nickname
 
-    public void StartClient()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
+            m_gamerules.AssociatePlayerWithGameObject(m_connectedPlayers[i].clientId, instantiatedPlayer);
+        }
 
-        m_environmentSpawner.InitializeEnvironmentClientRpc();
+        m_connectedPlayers = m_gamerules.GetAllConnectedPlayers();
+
+        GameObject instantiatedCatManager = Instantiate(m_catManagerPrefab);
+        m_catManager = instantiatedCatManager.GetComponent<CatManager>();
+        m_catManager.SetPlayerList(m_connectedPlayers);
     }
 
     static void StatusLabels()
@@ -201,13 +213,6 @@ public class ServerManager : NetworkBehaviour
         m_gamerules.RemovePlayer(clientId);
         m_connectedPlayers = m_gamerules.GetAllConnectedPlayers();
         UpdateConnectedPlayersUI();
-    }
-
-    // Select a random player from the list that will become the cat for the beginning of the game
-    public void SelectRandomCat()
-    {
-        //int index = Random.Range(0, m_connectedPlayers.Count);
-        //m_catManager.SetPlayerAsCat(m_connectedPlayers[index]);
     }
 }
 

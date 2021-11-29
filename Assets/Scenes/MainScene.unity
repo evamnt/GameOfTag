@@ -630,9 +630,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 681743537}
         m_TargetAssemblyTypeName: ServerManager, Assembly-CSharp
-        m_MethodName: StartHost
+        m_MethodName: ButtonStartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7396,12 +7396,13 @@ MonoBehaviour:
   m_serverUI: {fileID: 1834031605}
   m_connectedPlayersUI: {fileID: 2008381697}
   m_clientUI: {fileID: 1303064542}
+  m_playerPrefab: {fileID: 1228114864201243532, guid: 326917e56356f7040ab7d3df5d1485af, type: 3}
   m_warningName: {fileID: 2054536655}
   m_name: {fileID: 1938868651}
   m_spawnPositions: {fileID: 1388979721}
   m_environmentSpawner: {fileID: 1000082350}
-  m_catManager: {fileID: 0}
   m_gamerulesPrefab: {fileID: 509914796946616102, guid: f6ae91d44b9d3794fa290040999f0daf, type: 3}
+  m_catManagerPrefab: {fileID: 6422061329432856361, guid: 3bd2acfb9fa7820499425b98a9ce79f7, type: 3}
 --- !u!4 &681743538
 Transform:
   m_ObjectHideFlags: 0
@@ -13517,7 +13518,7 @@ GameObject:
   - component: {fileID: 1303064543}
   m_Layer: 5
   m_Name: Client
-  m_TagString: Untagged
+  m_TagString: MainMenuUI
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -18493,7 +18494,7 @@ GameObject:
   - component: {fileID: 1834031606}
   m_Layer: 5
   m_Name: Server
-  m_TagString: Untagged
+  m_TagString: MainMenuUI
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -21206,7 +21207,7 @@ GameObject:
   - component: {fileID: 2117771012}
   m_Layer: 5
   m_Name: ChooseModeUI
-  m_TagString: Untagged
+  m_TagString: MainMenuUI
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

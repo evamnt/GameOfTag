@@ -5,11 +5,17 @@ using Unity.Netcode;
 
 public class CatManager : NetworkBehaviour
 {
-    private List<GameObject> m_connectedPlayers;
+    private List<PlayerInfos> m_connectedPlayers;
 
-    public void UpdatePlayerList(List<GameObject> playerList)
+    public void SetPlayerList(List<PlayerInfos> playerList)
     {
         m_connectedPlayers = playerList;
+        SelectRandomCat();
+    }
+
+    void SelectRandomCat()
+    {
+        m_connectedPlayers[Random.Range(0, m_connectedPlayers.Count)].instantiatedPlayer.GetComponent<CatTimer>().SetPlayerStatus(true);
     }
 
     public void SetPlayerAsCat(GameObject catPlayer)
