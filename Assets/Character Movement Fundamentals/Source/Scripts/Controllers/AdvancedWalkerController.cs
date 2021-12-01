@@ -77,6 +77,12 @@ namespace CMF
 		
 		ControllerState currentControllerState = ControllerState.Falling;
 
+		public SkinnedMeshRenderer mat;
+		public Material hatmat;
+		public Material bodymat;
+		public Material stunnedmat;
+		public Material catmat;
+
 		[Tooltip("Optional camera transform used for calculating movement direction. If assigned, character movement will take camera view into account.")]
 		public Transform cameraTransform;
 		
@@ -92,6 +98,8 @@ namespace CMF
 				Debug.LogWarning("No character input script has been attached to this gameobject", this.gameObject);
 
 			Setup();
+
+			Invoke("CheckIfCat", 5f); // à changer
 		}
 
 		//This function is called right after Awake(); It can be overridden by inheriting scripts;
@@ -656,15 +664,38 @@ namespace CMF
 				momentum = _newMomentum;
 		}
 
+		public void callDisableStun()
+		{
+			Invoke("DisableStun", 2f);
+		}
+		private void DisableStun()
+		{
+			stunned = false;
+			Material[] mats = mat.materials;
+			mats[0] = catmat;
+			mats[1] = bodymat;
+			mat.materials = mats;
+		}
+
+		private void CheckIfCat()
+        {
+			if (timer.m_isCat)
+			{
+				Material[] mats = mat.materials;
+				mats[0] = catmat;
+				mats[1] = bodymat;
+				mat.materials = mats;
+			}
+		}
+
 		private void OnTriggerEnter(Collider other)
 		{
 			if (!timer.m_isCat) return;
-			Debug.Log("A");
+			if (stunned) return;
 
 			if (other.tag == "Player")
 			{
-				Debug.Log("B");
-				GameObject hit = other.gameObject;
+				GameObject hit = other.gameObject.gameObject;
 
 				CatTimer otherTimer = hit.GetComponent<CatTimer>();
 				AdvancedWalkerController otherController = hit.GetComponent<AdvancedWalkerController>();
@@ -672,9 +703,19 @@ namespace CMF
                 if (otherTimer != null && otherController != null)
                 {
 					otherTimer.m_isCat = true;
-					otherController.stunned = false;
+					otherController.stunned = true;
+					otherController.callDisableStun();
+
+					Material[] othermats = otherController.mat.materials;
+					othermats[0] = catmat;
+					othermats[1] = stunnedmat;
+					otherController.mat.materials = othermats;
 
 					timer.m_isCat = false;
+					Material[] mats = mat.materials;
+					mats[0] = hatmat;
+					mats[1] = bodymat;
+					mat.materials = mats;
 				}
             }
 		}

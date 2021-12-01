@@ -491,6 +491,7 @@ Transform:
   - {fileID: 1225333402924218846}
   - {fileID: 1233473783707010518}
   - {fileID: 6921534387772556566}
+  - {fileID: 8141266834438025541}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -576,6 +577,11 @@ MonoBehaviour:
   slideGravity: 5
   slopeLimit: 80
   useLocalMomentum: 1
+  mat: {fileID: 1218305812047430640}
+  hatmat: {fileID: 2100000, guid: bbfba1bed9130b346ace2f34da8e6765, type: 2}
+  bodymat: {fileID: 2100000, guid: 8675ae4aa2da1114d8b2d358969ce630, type: 2}
+  stunnedmat: {fileID: 2100000, guid: 121b024a4658cf4409af8632d7088c2e, type: 2}
+  catmat: {fileID: 2100000, guid: 6bc432dd61c9f944ba143f4ec310ea9c, type: 2}
   cameraTransform: {fileID: 1225179072303214246}
 --- !u!114 &1196352348084265180
 MonoBehaviour:
@@ -1040,7 +1046,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1233712664059941940}
-  - {fileID: 8141266834438025541}
   m_Father: {fileID: 1225426479022440278}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1353,12 +1358,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4347521126648027658}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 1.04, z: 0}
   m_LocalScale: {x: 4, y: 2, z: 4}
   m_Children: []
-  m_Father: {fileID: 1225333402924218846}
-  m_RootOrder: 1
+  m_Father: {fileID: 1225426479022440278}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3414105853983065091
 MeshFilter:
