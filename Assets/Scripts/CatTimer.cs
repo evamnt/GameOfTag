@@ -19,7 +19,10 @@ public class CatTimer : NetworkBehaviour
 
     private void Start()
     {
-        m_catTime.text = "Cat Timer: 0";
+        if (IsLocalPlayer)
+            m_catTime.text = "Cat Timer: 0";
+        else
+            m_catTime.enabled = false;
     }
 
     public void SetPlayerStatus(bool cat)
