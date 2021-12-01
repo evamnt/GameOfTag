@@ -127,11 +127,8 @@ public class ServerManager : NetworkBehaviour
             m_creatingHost = false;
             if (NetworkManager.Singleton.StartClient())
             {
-                
-                {
-                    m_chooseModeUI.SetActive(false);
-                    m_clientUI.SetActive(true);
-                }
+                m_chooseModeUI.SetActive(false);
+                m_clientUI.SetActive(true);
             }
         }
         
