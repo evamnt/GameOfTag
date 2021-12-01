@@ -15,9 +15,10 @@ namespace CMF
 		protected Mover mover;
 		protected CharacterInput characterInput;
 		protected CeilingDetector ceilingDetector;
+		public CatTimer timer;
 
-        //Jump key variables;
-        bool jumpInputIsLocked = false;
+		//Jump key variables;
+		bool jumpInputIsLocked = false;
         bool jumpKeyWasPressed = false;
 		bool jumpKeyWasLetGo = false;
 		bool jumpKeyIsPressed = false;
@@ -31,6 +32,9 @@ namespace CMF
 
 		//Jump speed;
 		public float jumpSpeed = 10f;
+
+		//Stunned?
+		public bool stunned = false;
 
 		//Jump duration variables;
 		public float jumpDuration = 0.2f;
@@ -82,8 +86,9 @@ namespace CMF
 			tr = transform;
 			characterInput = GetComponent<CharacterInput>();
 			ceilingDetector = GetComponent<CeilingDetector>();
+			timer = GetComponent<CatTimer>();
 
-			if(characterInput == null)
+			if (characterInput == null)
 				Debug.LogWarning("No character input script has been attached to this gameobject", this.gameObject);
 
 			Setup();
@@ -96,6 +101,7 @@ namespace CMF
 
 		void Update()
 		{
+			if (stunned) return;
 			HandleJumpKeyInput();
 		}
 
@@ -118,6 +124,7 @@ namespace CMF
 
         void FixedUpdate()
 		{
+			if (stunned) return;
 			ControllerUpdate();
 		}
 
@@ -647,6 +654,29 @@ namespace CMF
 				momentum = tr.worldToLocalMatrix * _newMomentum;
 			else
 				momentum = _newMomentum;
+		}
+
+		private void OnTriggerEnter(Collider other)
+		{
+			if (!timer.m_isCat) return;
+			Debug.Log("A");
+
+			if (other.tag == "Player")
+			{
+				Debug.Log("B");
+				GameObject hit = other.gameObject;
+
+				CatTimer otherTimer = hit.GetComponent<CatTimer>();
+				AdvancedWalkerController otherController = hit.GetComponent<AdvancedWalkerController>();
+
+                if (otherTimer != null && otherController != null)
+                {
+					otherTimer.m_isCat = true;
+					otherController.stunned = false;
+
+					timer.m_isCat = false;
+				}
+            }
 		}
 	}
 }

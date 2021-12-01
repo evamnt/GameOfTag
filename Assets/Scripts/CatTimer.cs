@@ -8,7 +8,7 @@ public class CatTimer : NetworkBehaviour
 {
     public TMP_Text m_catTime;
 
-    private bool m_isCat = false;
+    public bool m_isCat = false;
     private NetworkVariable<float> m_timer = new NetworkVariable<float>(NetworkVariableReadPermission.Everyone, 0);
 
     private void Update()
