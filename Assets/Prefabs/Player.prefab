@@ -580,7 +580,7 @@ MonoBehaviour:
   mat: {fileID: 1218305812047430640}
   hatmat: {fileID: 2100000, guid: bbfba1bed9130b346ace2f34da8e6765, type: 2}
   bodymat: {fileID: 2100000, guid: 8675ae4aa2da1114d8b2d358969ce630, type: 2}
-  stunnedmat: {fileID: 2100000, guid: 121b024a4658cf4409af8632d7088c2e, type: 2}
+  stunnedmat: {fileID: 2100000, guid: d4b0fd0a61cdad846a53720a5be331a9, type: 2}
   catmat: {fileID: 2100000, guid: 6bc432dd61c9f944ba143f4ec310ea9c, type: 2}
   cameraTransform: {fileID: 1225179072303214246}
 --- !u!114 &1196352348084265180

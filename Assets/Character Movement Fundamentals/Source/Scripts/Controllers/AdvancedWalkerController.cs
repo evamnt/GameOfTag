@@ -702,7 +702,7 @@ namespace CMF
 
                 if (otherTimer != null && otherController != null)
                 {
-					otherTimer.m_isCat = true;
+					otherTimer.SetPlayerStatus(true);
 					otherController.stunned = true;
 					otherController.callDisableStun();
 
@@ -711,7 +711,7 @@ namespace CMF
 					othermats[1] = stunnedmat;
 					otherController.mat.materials = othermats;
 
-					timer.m_isCat = false;
+					timer.SetPlayerStatus(false);
 					Material[] mats = mat.materials;
 					mats[0] = hatmat;
 					mats[1] = bodymat;
