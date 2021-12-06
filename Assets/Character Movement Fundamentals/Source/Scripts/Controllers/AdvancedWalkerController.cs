@@ -45,6 +45,14 @@ namespace CMF
 		public float airFriction = 0.5f;
 		public float groundFriction = 100f;
 
+		//Particles for abilites
+		public GameObject partDash;
+		public GameObject partHaste;
+
+		//abilites checks
+		bool canDash = true;
+		bool canHaste = true;
+
 		//Current momentum;
 		protected Vector3 momentum = Vector3.zero;
 
@@ -111,6 +119,9 @@ namespace CMF
 		{
 			if (stunned) return;
 			HandleJumpKeyInput();
+
+			if (!timer.m_isCat) return;
+			CheckAbilities();
 		}
 
         //Handle jump booleans for later use in FixedUpdate;
@@ -134,6 +145,63 @@ namespace CMF
 		{
 			if (stunned) return;
 			ControllerUpdate();
+		}
+
+		void CheckAbilities()
+        {
+			if (Input.GetMouseButtonDown(0)) //left clicks
+            {
+				Dash();
+			}
+
+			if (Input.GetMouseButtonDown(1)) //right clicks
+			{
+				Haste();
+			}
+		}
+
+		void Dash()
+        {
+			if(canDash)
+            {
+				gameObject.GetComponent<Rigidbody>().AddForce(cameraTransform.forward * 300, ForceMode.Impulse);
+
+				partDash.SetActive(false);
+
+				canDash = false;
+
+				Invoke("cooldownDash", 4f);
+			}
+        }
+
+		void Haste()
+        {
+			if (canHaste)
+            {
+				movementSpeed = 10f;
+
+				partHaste.SetActive(true);
+
+				canHaste = false;
+
+				Invoke("resetSpeed", 3f);
+				Invoke("cooldownHaste", 12f);
+			}
+		}
+
+		void cooldownDash()
+		{
+			partDash.SetActive(true);
+			canDash = true;
+		}
+		void cooldownHaste()
+		{
+			partHaste.SetActive(false);
+			canHaste = true;
+		}
+		void resetSpeed()
+		{
+			movementSpeed = 7f;
 		}
 
 		//Update controller;
@@ -685,6 +753,8 @@ namespace CMF
 				mats[0] = catmat;
 				mats[1] = bodymat;
 				mat.materials = mats;
+
+				partDash.SetActive(true);
 			}
 		}
 
@@ -705,6 +775,11 @@ namespace CMF
 					otherTimer.SetPlayerStatus(true);
 					otherController.stunned = true;
 					otherController.callDisableStun();
+					otherController.cooldownDash();
+					otherController.cooldownHaste();
+					otherController.resetSpeed();
+					otherController.partDash.SetActive(false);
+					otherController.partHaste.SetActive(false);
 
 					Material[] othermats = otherController.mat.materials;
 					othermats[0] = catmat;
@@ -716,6 +791,9 @@ namespace CMF
 					mats[0] = hatmat;
 					mats[1] = bodymat;
 					mat.materials = mats;
+
+					movementSpeed = 14f;
+					Invoke("resetSpeed", 6f);
 				}
             }
 		}
