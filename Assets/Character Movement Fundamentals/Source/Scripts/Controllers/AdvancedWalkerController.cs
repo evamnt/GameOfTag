@@ -35,6 +35,7 @@ namespace CMF
 
 		//Stunned?
 		public bool stunned = false;
+		private Vector3 stunPosition;
 
 		//last cat
 		bool lastCat = false;
@@ -112,8 +113,6 @@ namespace CMF
 				Debug.LogWarning("No character input script has been attached to this gameobject", this.gameObject);
 
 			Setup();
-
-			Invoke("CheckIfCat", 0); // à changer
 		}
 
 		//This function is called right after Awake(); It can be overridden by inheriting scripts;
@@ -150,8 +149,14 @@ namespace CMF
 
         void FixedUpdate()
 		{
-			if (stunned) return;
-			ControllerUpdate();
+			if (stunned)
+            {
+				transform.position = new Vector3(stunPosition.x, transform.position.y, stunPosition.z);
+			}
+			else
+            {
+				ControllerUpdate();
+			}
 		}
 
 		void CheckAbilities()
@@ -754,55 +759,53 @@ namespace CMF
 			mat.materials = mats;
 		}
 
-		private void CheckIfCat()
-        {
-			if (timer.IsCat)
-			{
-				Material[] mats = mat.materials;
-				mats[0] = catmat;
-				mats[1] = bodymat;
-				mat.materials = mats;
+		//private void CheckIfCat()
+  //      {
+		//	if (timer.IsCat)
+		//	{
+		//		Material[] mats = mat.materials;
+		//		mats[0] = catmat;
+		//		mats[1] = bodymat;
+		//		mat.materials = mats;
 
-				partDash.SetActive(true);
-			}
-		}
+		//		partDash.SetActive(true);
+		//	}
+		//}
 
 		private void setCat(bool newCatValue, bool first)
         {
-			if(lastCat == newCatValue)
+			if(lastCat != newCatValue)
             {
-				return;
-            }
+				lastCat = newCatValue;
+				if (newCatValue)
+				{
+					if (!firstAssignation)
+					{
+						stunned = true;
+						stunPosition = transform.position;
+					}
+					callDisableStun();
+					cooldownDash();
+					cooldownHaste();
+					resetSpeed();
+					partDash.SetActive(false);
+					partHaste.SetActive(false);
 
-			lastCat = newCatValue;
-
-			if (newCatValue) 
-            {
-				if (!firstAssignation)
-                {
-					stunned = true;
+					Material[] mats = mat.materials;
+					mats[0] = catmat;
+					mats[1] = stunnedmat;
+					mat.materials = mats;
 				}
-				callDisableStun();
-				cooldownDash();
-				cooldownHaste();
-				resetSpeed();
-				partDash.SetActive(false);
-				partHaste.SetActive(false);
+				else
+				{
+					Material[] mats = mat.materials;
+					mats[0] = hatmat;
+					mats[1] = bodymat;
+					mat.materials = mats;
 
-				Material[] mats = mat.materials;
-				mats[0] = catmat;
-				mats[1] = stunnedmat;
-				mat.materials = mats;
-			}
-            else
-            {
-				Material[] mats = mat.materials;
-				mats[0] = hatmat;
-				mats[1] = bodymat;
-				mat.materials = mats;
-
-				movementSpeed = 14f;
-				Invoke("resetSpeed", 5f);
+					movementSpeed = 14f;
+					Invoke("resetSpeed", 5f);
+				}
 			}
 
 			if (firstAssignation)
@@ -816,11 +819,6 @@ namespace CMF
 			CheckCollision(other);
 		}
 
-        private void OnTriggerStay(Collider other)
-        {
-			CheckCollision(other);
-		}
-
         private void CheckCollision(Collider other)
         {
 			if (other.tag == "Player")
@@ -829,12 +827,9 @@ namespace CMF
 				if (stunned) return;
 				if (IsHost)
 				{
-					GameObject hit = other.gameObject.gameObject;
+					CatTimer otherTimer = other.GetComponent<CatTimer>();
 
-					CatTimer otherTimer = hit.GetComponent<CatTimer>();
-					AdvancedWalkerController otherController = hit.GetComponent<AdvancedWalkerController>();
-
-					if (otherTimer != null && otherController != null)
+					if (otherTimer != null)
 					{
 						otherTimer.SetPlayerStatus(true);
 
