@@ -123,7 +123,8 @@ namespace CMF
 		{
 			HandleJumpKeyInput();
 
-			setCat(timer.IsCat, firstAssignation);
+			if (!IsHost)
+				setCat(timer.IsCat, firstAssignation);
 
 			if (!timer.IsCat) return;
 			CheckAbilities();
@@ -806,7 +807,7 @@ namespace CMF
 			}
         }
 
-		private void OnTriggerEnter(Collider other)
+		private void OnTriggerStay(Collider other)
 		{
 			CheckCollision(other);
 		}
@@ -827,6 +828,9 @@ namespace CMF
 
 						timer.SetPlayerStatus(false);
 					}
+
+					setCat(false, false);
+					other.GetComponent<AdvancedWalkerController>().setCat(true, false);
 				}
 			}
 		}
