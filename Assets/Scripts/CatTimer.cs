@@ -8,8 +8,13 @@ public class CatTimer : NetworkBehaviour
 {
     public TMP_Text m_catTime;
 
-    public bool m_isCat = false;
+    private NetworkVariable<bool> m_isCat = new NetworkVariable<bool>(NetworkVariableReadPermission.Everyone, false);
     private NetworkVariable<float> m_timer = new NetworkVariable<float>(NetworkVariableReadPermission.Everyone, 0);
+
+    public bool IsCat
+    {
+        get { return m_isCat.Value; }
+    }
 
     private void Update()
     {
@@ -24,7 +29,7 @@ public class CatTimer : NetworkBehaviour
 
     public void SetPlayerStatus(bool cat)
     {
-        m_isCat = cat;
+        m_isCat.Value = cat;
         if (cat)
         {
             StartTimer();
