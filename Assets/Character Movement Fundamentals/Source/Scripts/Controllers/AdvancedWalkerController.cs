@@ -35,7 +35,6 @@ namespace CMF
 
 		//Stunned?
 		public bool stunned = false;
-		private Vector3 stunPosition;
 
 		//last cat
 		bool lastCat = false;
@@ -149,14 +148,7 @@ namespace CMF
 
         void FixedUpdate()
 		{
-			if (stunned)
-            {
-				transform.position = new Vector3(stunPosition.x, transform.position.y, stunPosition.z);
-			}
-			else
-            {
-				ControllerUpdate();
-			}
+			ControllerUpdate();
 		}
 
 		void CheckAbilities()
@@ -232,11 +224,12 @@ namespace CMF
 			HandleMomentum();
 
 			//Check if the player has initiated a jump;
-			HandleJumping();
+			if (!stunned)
+				HandleJumping();
 
 			//Calculate movement velocity;
 			Vector3 _velocity = Vector3.zero;
-			if(currentControllerState == ControllerState.Grounded)
+			if(currentControllerState == ControllerState.Grounded && !stunned)
 				_velocity = CalculateMovementVelocity();
 			
 			//If local momentum is used, transform momentum into world space first;
@@ -782,7 +775,6 @@ namespace CMF
 					if (!firstAssignation)
 					{
 						stunned = true;
-						stunPosition = transform.position;
 					}
 					callDisableStun();
 					cooldownDash();
