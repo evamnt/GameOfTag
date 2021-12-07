@@ -112,6 +112,8 @@ namespace CMF
 				Debug.LogWarning("No character input script has been attached to this gameobject", this.gameObject);
 
 			Setup();
+
+			setCat(timer.IsCat, firstAssignation);
 		}
 
 		//This function is called right after Awake(); It can be overridden by inheriting scripts;
