@@ -813,6 +813,16 @@ namespace CMF
 
 		private void OnTriggerEnter(Collider other)
 		{
+			CheckCollision(other);
+		}
+
+        private void OnTriggerStay(Collider other)
+        {
+			CheckCollision(other);
+		}
+
+        private void CheckCollision(Collider other)
+        {
 			if (other.tag == "Player")
 			{
 				if (!timer.IsCat) return;
