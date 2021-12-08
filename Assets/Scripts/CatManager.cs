@@ -15,7 +15,6 @@ public class CatManager : NetworkBehaviour
 
     void SelectRandomCat()
     {
-        Debug.Log(m_connectedPlayers.Count);
         m_connectedPlayers[Random.Range(0, m_connectedPlayers.Count)].instantiatedPlayer.GetComponent<CatTimer>().SetPlayerStatus(true);
     }
 

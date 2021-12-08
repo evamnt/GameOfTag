@@ -15,8 +15,8 @@ namespace CMF
 		public Light sceneLight;
 
 		//Start;
-		void Start () {
-			sceneLight = this.GetComponent<Light>();
+		void Awake () {
+			sceneLight = GetComponent<Light>();
 		}
 
 		//This function is called by an external script to disable/enable shadows in the scene;

@@ -13,13 +13,23 @@ namespace CMF
 
 		void FixedUpdate ()
 		{
-			for(int i = 0; i < rigidbodies.Count; i++)
+			int rbNb = rigidbodies.Count;
+			for(int i = 0; i < rbNb; i++)
 			{
-				//Calculate center position based on rigidbody position;
-				Vector3 _center = 
-					Vector3.Project((rigidbodies[i].transform.position - transform.position) ,((transform.position + transform.forward) - transform.position)) + transform.position;
-				
-				RotateRigidbody(rigidbodies[i].transform, (_center - rigidbodies[i].transform.position).normalized);
+				if (rigidbodies[i])
+                {
+					//Calculate center position based on rigidbody position;
+					Vector3 _center =
+						Vector3.Project((rigidbodies[i].transform.position - transform.position), ((transform.position + transform.forward) - transform.position)) + transform.position;
+
+					RotateRigidbody(rigidbodies[i].transform, (_center - rigidbodies[i].transform.position).normalized);
+				}
+				else
+                {
+					rigidbodies.RemoveAt(i);
+					i--;
+					rbNb--;
+                }
 			}
 		}
 

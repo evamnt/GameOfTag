@@ -21,7 +21,8 @@ public class Gamerules : MonoBehaviour
 
     public void AddClient(ulong clientId, string nickname)
     {
-        m_allPlayersInfos.Add(new PlayerInfos(clientId, nickname));
+        string formattedNickname = nickname.Remove(nickname.Length - 1);
+        m_allPlayersInfos.Add(new PlayerInfos(clientId, formattedNickname));
     }
 
     public int GetPlayersNb()

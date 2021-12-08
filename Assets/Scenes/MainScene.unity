@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: b965aa9d3a0654047bcb87de65cd2552, type: 2}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -1271,9 +1271,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 681743537}
         m_TargetAssemblyTypeName: ServerManager, Assembly-CSharp
-        m_MethodName: StartHost
+        m_MethodName: Disconnect
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1810,7 +1810,7 @@ GameObject:
   - component: {fileID: 159435871}
   - component: {fileID: 159435870}
   m_Layer: 5
-  m_Name: ShowcaseUI
+  m_Name: UIs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3394,12 +3394,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuKey: 109
   demoMenuObject: {fileID: 1843790524}
-  controllers:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   buttons:
   - {fileID: 1313102661}
   - {fileID: 112122692}
@@ -3408,7 +3402,6 @@ MonoBehaviour:
   - {fileID: 219320871}
   shadowToggle: {fileID: 986405954}
   regularArea: {fileID: 183675021}
-  topDownArea: {fileID: 0}
   activeButtonColor: {r: 0.456423, g: 0.9852941, b: 0.9852941, a: 1}
   m_serverManager: {fileID: 681743537}
 --- !u!114 &281157554
@@ -10572,7 +10565,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Restart
+  m_Text: Exit to menu
 --- !u!222 &966672076
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -14074,7 +14067,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Quit
+  m_Text: Quit game
 --- !u!222 &1363107110
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -18633,12 +18626,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1843790525}
   m_Layer: 5
-  m_Name: DemoMenu
+  m_Name: PauseMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1843790525
 RectTransform:
   m_ObjectHideFlags: 0
@@ -18898,7 +18891,7 @@ MonoBehaviour:
   MessageBufferSize: 5120
   MaxConnections: 100
   MaxSentMessageQueueSize: 128
-  ConnectAddress: 10.0.0.235
+  ConnectAddress: 127.0.0.1
   ConnectPort: 7777
   ServerListenPort: 7777
   MessageSendMode: 0
@@ -18925,21 +18918,6 @@ MonoBehaviour:
     - Override: 0
       Prefab: {fileID: 1228114864201243532, guid: 326917e56356f7040ab7d3df5d1485af, type: 3}
       SourcePrefabToOverride: {fileID: 1228114864201243532, guid: 326917e56356f7040ab7d3df5d1485af, type: 3}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
-    - Override: 0
-      Prefab: {fileID: 3823788566217589367, guid: fcfa598ec0c514f4c8511a93fb9c9529, type: 3}
-      SourcePrefabToOverride: {fileID: 0}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
-    - Override: 0
-      Prefab: {fileID: 5199617796262626822, guid: 8776fbe6b2923484eab2ff80cc03c546, type: 3}
-      SourcePrefabToOverride: {fileID: 0}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
-    - Override: 0
-      Prefab: {fileID: 3801405331299985485, guid: 851e3314f58cad240b39c7b95a341bfb, type: 3}
-      SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
     TickRate: 30
@@ -20593,9 +20571,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 681743537}
         m_TargetAssemblyTypeName: ServerManager, Assembly-CSharp
-        m_MethodName: StartHost
+        m_MethodName: Disconnect
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -21211,7 +21189,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2117771012
 RectTransform:
   m_ObjectHideFlags: 0

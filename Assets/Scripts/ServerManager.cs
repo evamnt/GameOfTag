@@ -134,11 +134,6 @@ public class ServerManager : NetworkBehaviour
         
     }
 
-    public void Disconnect()
-    {
-        NetworkManager.Singleton.DisconnectClient(NetworkManager.Singleton.LocalClientId);
-    }
-
     public void ButtonStartGame()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -160,6 +155,7 @@ public class ServerManager : NetworkBehaviour
         GameObject instantiatedCatManager = Instantiate(m_catManagerPrefab);
         m_catManager = instantiatedCatManager.GetComponent<CatManager>();
         m_catManager.SetPlayerList(m_connectedPlayers);
+        GameStarted = true;
     }
 
     static void StatusLabels()
@@ -187,13 +183,13 @@ public class ServerManager : NetworkBehaviour
             m_gamerules.AddClient(clientId, connectedPlayerName);
             UpdateConnectedPlayersUI();
         }
-        else if (m_gamerules.GetPlayersNb() >= 2)
+        else if (m_gamerules.GetPlayersNb() >= 6)
         {
             Debug.Log("Limit of players reached");
             //If approve is true, the connection gets added. If it's false. The client gets disconnected
             callback(false, null, false, Vector3.zero, Quaternion.identity);
         }
-        else
+        else if (!GameStarted)
         {
             //If approve is true, the connection gets added. If it's false. The client gets disconnected
             callback(false, null, true, Vector3.zero, Quaternion.identity);
@@ -210,6 +206,11 @@ public class ServerManager : NetworkBehaviour
         m_gamerules.RemovePlayer(clientId);
         m_connectedPlayers = m_gamerules.GetAllConnectedPlayers();
         UpdateConnectedPlayersUI();
+    }
+
+    public void Disconnect()
+    {
+        GameObject.FindObjectOfType<CMF.DemoMenu>().RestartScene();
     }
 }
 

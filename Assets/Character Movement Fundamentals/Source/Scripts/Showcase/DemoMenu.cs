@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 namespace CMF
 {
 	//This script is used in the showcase scene to control the controller selection/settings menu;
-	public class DemoMenu : MonoBehaviour {
+	public class DemoMenu : NetworkBehaviour {
 
 		//The menu is shown/hidden using this key;
 		public KeyCode menuKey = KeyCode.M;
@@ -20,7 +21,7 @@ namespace CMF
 		public GameObject demoMenuObject;
 
 		//List of controllers to choose from;
-		public List<GameObject> controllers = new List<GameObject>();
+		//public List<GameObject> controllers = new List<GameObject>();
 		//List of controller selection buttons in the menu UI;
 		public List<Button> buttons = new List<Button>();
 
@@ -29,7 +30,7 @@ namespace CMF
 
 		//Reference to the two separate areas in the showcase scene;
 		public GameObject regularArea;
-		public GameObject topDownArea;
+		//public GameObject topDownArea;
 
 		//Color of currently selected controller prefab button;
 		public Color activeButtonColor = Color.cyan;
@@ -49,24 +50,24 @@ namespace CMF
 			disableShadows.SetShadows(PlayerData.enableShadows);
 			shadowToggle.isOn = PlayerData.enableShadows;
 
-			//Deactivate all controller presets in the scene;
-			for(int i = 0; i < controllers.Count; i++)
-			{
-				controllers[i].SetActive(false);
-			}
+			////Deactivate all controller presets in the scene;
+			//for(int i = 0; i < controllers.Count; i++)
+			//{
+			//	controllers[i].SetActive(false);
+			//}
 
-			//Activate the correct controller preset based on the preset index;
-			controllers[PlayerData.controllerIndex].SetActive(true);
+			////Activate the correct controller preset based on the preset index;
+			//controllers[PlayerData.controllerIndex].SetActive(true);
 
-			//Activate the correct level area based on preset index;
-			if(PlayerData.controllerIndex >= 4)
-			{
-				regularArea.SetActive(false);
-			}
-			else
-			{
-				topDownArea.SetActive(false);
-			}
+			////Activate the correct level area based on preset index;
+			//if(PlayerData.controllerIndex >= 4)
+			//{
+			//	regularArea.SetActive(false);
+			//}
+			//else
+			//{
+			//	topDownArea.SetActive(false);
+			//}
 
 			//Colorize the correct button based on controller index;
 			ColorBlock c = buttons[PlayerData.controllerIndex].colors;
@@ -105,6 +106,12 @@ namespace CMF
 		//Reload scene;
 		public void RestartScene()
 		{
+			//We disconnect
+			NetworkManager.Singleton.Shutdown();
+
+			Destroy(NetworkManager.Singleton.gameObject);
+
+			//And then reload the scene
 			SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 		}
 
