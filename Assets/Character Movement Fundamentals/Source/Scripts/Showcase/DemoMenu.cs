@@ -75,7 +75,6 @@ namespace CMF
 			c.highlightedColor = activeButtonColor;
 			c.pressedColor = activeButtonColor;
 			buttons[PlayerData.controllerIndex].colors = c;
-			
 		}
 		
 		// Update is called once per frame

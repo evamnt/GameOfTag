@@ -38,6 +38,7 @@ public class ServerManager : NetworkBehaviour
     private List<int> m_freeSpawnPoints = new List<int>();
     private bool m_creatingHost;
     private bool m_gameStarted = false;
+    private bool m_gameFinished = false;
 
     private List<TMP_Text> m_connectedPlayersTextBoxes = new List<TMP_Text>();
     private TMP_Text m_playersNb;
@@ -49,6 +50,11 @@ public class ServerManager : NetworkBehaviour
         set { m_gameStarted = value; }
     }
 
+    public bool GameFinished
+    {
+        set { m_gameFinished = value; }
+        private get { return m_gameFinished; }
+    }
     private void Start()
     {
         m_warningName.SetActive(false);
@@ -69,6 +75,15 @@ public class ServerManager : NetworkBehaviour
         }
         m_playersNb = m_connectedPlayersUI.transform.GetChild(7).GetComponent<TMP_Text>();
         m_playersNb.text = "0 / " + m_connectedPlayersTextBoxes.Count;
+    }
+
+    private void Update()
+    {
+        if ((GameStarted || GameFinished) && Camera.allCamerasCount == 1)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Disconnect();
+        }
     }
 
     private bool CheckNickname()

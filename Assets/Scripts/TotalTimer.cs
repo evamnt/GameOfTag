@@ -34,18 +34,24 @@ public class TotalTimer : NetworkBehaviour
             StopTimer();
             GetComponent<CatTimer>().StopTimer();
             GameObject gameRules = GameObject.FindGameObjectWithTag("Gamerules");
-            string winnerName = gameRules.GetComponent<Gamerules>().GetWinner().nickname;;
+            string winnerName = gameRules.GetComponent<Gamerules>().GetWinner().nickname;
             ShowWinnerClientRpc(winnerName);
-            
         }
-            
     }
 
     [ClientRpc]
     void ShowWinnerClientRpc(FixedString64Bytes winnerName)
     {
+        GameObject.FindObjectOfType<ServerManager>().GameStarted = false;
+        GameObject.FindObjectOfType<ServerManager>().GameFinished = true;
+        Cursor.lockState = CursorLockMode.None;
         winMenu.GetComponentInChildren<TMP_Text>().text = "And the winner is: " + winnerName + " !";
         winMenu.SetActive(true);
+    }
+
+    public void ExitToMainMenu()
+    {
+        GameObject.FindObjectOfType<CMF.DemoMenu>().RestartScene();
     }
 
     private void Start()
