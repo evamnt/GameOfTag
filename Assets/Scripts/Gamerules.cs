@@ -41,4 +41,17 @@ public class Gamerules : MonoBehaviour
         PlayerInfos oldInfos = m_allPlayersInfos[playerIndex];
         m_allPlayersInfos[playerIndex] = new PlayerInfos(oldInfos.clientId, oldInfos.nickname, instantiatedPlayer);
     }
+
+    public PlayerInfos GetWinner()
+    {
+        PlayerInfos winner = m_allPlayersInfos[0];
+        for (int index = 1; index < m_allPlayersInfos.Count; index++)
+        {
+           if(m_allPlayersInfos[index].instantiatedPlayer.GetComponent<CatTimer>().Timer < winner.instantiatedPlayer.GetComponent<CatTimer>().Timer)
+            {
+                winner = m_allPlayersInfos[index];
+            }
+        }
+        return winner;
+    }
 }
