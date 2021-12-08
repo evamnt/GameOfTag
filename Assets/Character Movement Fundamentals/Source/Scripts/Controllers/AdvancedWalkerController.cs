@@ -54,10 +54,13 @@ namespace CMF
 		//Particles for abilites
 		public GameObject partDash;
 		public GameObject partHaste;
+		public GameObject partHasteCD;
+
+		//Collider
+		public MeshRenderer coll;
 
 		//abilites checks
 		bool canDash = true;
-		bool canHaste = true;
 
 		//Current momentum;
 		protected Vector3 momentum = Vector3.zero;
@@ -163,11 +166,6 @@ namespace CMF
             {
 				Dash();
 			}
-
-			if (Input.GetMouseButtonDown(1)) //right clicks
-			{
-				Haste();
-			}
 		}
 
 		void Dash()
@@ -176,29 +174,28 @@ namespace CMF
             {
 				Vector3 dashDirection = new Vector3(cameraTransform.forward.x, 0, cameraTransform.forward.z).normalized;
 
-				gameObject.GetComponent<Rigidbody>().AddForce(dashDirection * 300, ForceMode.Impulse);
+				gameObject.GetComponent<Rigidbody>().AddForce(dashDirection * 5000);
 
 				partDash.SetActive(false);
 
 				canDash = false;
 
-				Invoke("cooldownDash", 4f);
+				Invoke("cooldownDash", 3f);
 			}
         }
 
 		void Haste()
-        {
-			if (canHaste)
-            {
-				movementSpeed = 10f;
+		{
+			CancelInvoke("cooldownHaste");
+			CancelInvoke("resetSpeed");
 
-				partHaste.SetActive(true);
+			movementSpeed = 10f;
 
-				canHaste = false;
+			partHaste.SetActive(true);
+			partHasteCD.SetActive(true);
 
-				Invoke("resetSpeed", 3f);
-				Invoke("cooldownHaste", 12f);
-			}
+			Invoke("resetSpeed", 6f);
+			Invoke("cooldownHaste", 12f);
 		}
 
 		void cooldownDash()
@@ -208,11 +205,11 @@ namespace CMF
 		}
 		void cooldownHaste()
 		{
-			partHaste.SetActive(false);
-			canHaste = true;
+			partHasteCD.SetActive(false);
 		}
 		void resetSpeed()
 		{
+			partHaste.SetActive(false);
 			movementSpeed = 7f;
 		}
 
@@ -786,13 +783,13 @@ namespace CMF
 					cooldownDash();
 					cooldownHaste();
 					resetSpeed();
-					partDash.SetActive(false);
-					partHaste.SetActive(false);
 
 					Material[] mats = mat.materials;
 					mats[0] = catmat;
 					mats[1] = stunnedmat;
 					mat.materials = mats;
+
+					coll.enabled = true;
 				}
 				else
 				{
@@ -801,8 +798,18 @@ namespace CMF
 					mats[1] = bodymat;
 					mat.materials = mats;
 
+					partDash.SetActive(false);
+					partHaste.SetActive(true);
+					partHasteCD.SetActive(false);
+					canDash = false;
+
 					movementSpeed = 14f;
-					Invoke("resetSpeed", 5f);
+					Invoke("resetSpeed", 3f);
+
+					CancelInvoke("cooldownDash");
+					CancelInvoke("cooldownHaste");
+
+					coll.enabled = false;
 				}
 			}
 
@@ -837,6 +844,17 @@ namespace CMF
 					setCat(false, false);
 					other.GetComponent<AdvancedWalkerController>().setCat(true, false);
 				}
+			}
+			else if(other.tag == "Collectible")
+            {
+				Collectible otherCollectible = other.GetComponent<Collectible>();
+
+				if (!otherCollectible.visible) return;
+
+				otherCollectible.setVisible(false);
+				otherCollectible.callingVisibleFunc(true, 5f);
+
+				Haste();
 			}
 		}
 	}

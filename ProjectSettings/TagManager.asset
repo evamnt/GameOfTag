@@ -7,6 +7,7 @@ TagManager:
   - Gamerules
   - ConnectedPlayers
   - MainMenuUI
+  - Collectible
   layers:
   - Default
   - TransparentFX
