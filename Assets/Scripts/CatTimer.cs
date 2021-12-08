@@ -16,6 +16,11 @@ public class CatTimer : NetworkBehaviour
         get { return m_isCat.Value; }
     }
 
+    public float Timer
+    {
+        get { return m_timer.Value; }
+    }
+
     private void Update()
     {
         if (IsLocalPlayer)
