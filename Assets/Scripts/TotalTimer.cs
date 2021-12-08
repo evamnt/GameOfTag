@@ -67,8 +67,8 @@ public class TotalTimer : NetworkBehaviour
         }
         if (IsHost)
         {
-            m_timerMinute.Value = 0f;
-            m_timerSecond.Value = 10f;
+            m_timerMinute.Value = 5f;
+            m_timerSecond.Value = 0f;
             StartTimer();
         }
             

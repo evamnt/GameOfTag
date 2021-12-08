@@ -51,11 +51,6 @@ namespace CMF
 		public float airFriction = 0.5f;
 		public float groundFriction = 100f;
 
-		//Particles for abilites
-		public GameObject partDash;
-		public GameObject partHaste;
-		public GameObject partHasteCD;
-
 		//Collider
 		public MeshRenderer coll;
 
@@ -82,6 +77,8 @@ namespace CMF
 		[Tooltip("Whether to calculate and apply momentum relative to the controller's transform.")]
 		public bool useLocalMomentum = false;
 
+		private ParticlesManager m_particlesManager;
+
 		//Enum describing basic controller states; 
 		public enum ControllerState
 		{
@@ -105,6 +102,8 @@ namespace CMF
 		
 		//Get references to all necessary components;
 		void Awake () {
+			m_particlesManager = GetComponent<ParticlesManager>();
+
 			mover = GetComponent<Mover>();
 			tr = transform;
 			characterInput = GetComponent<CharacterInput>();
@@ -176,7 +175,7 @@ namespace CMF
 
 				gameObject.GetComponent<Rigidbody>().AddForce(dashDirection * 5000);
 
-				partDash.SetActive(false);
+				m_particlesManager.SetPartDash(false);
 
 				canDash = false;
 
@@ -191,8 +190,8 @@ namespace CMF
 
 			movementSpeed = 10f;
 
-			partHaste.SetActive(true);
-			partHasteCD.SetActive(true);
+			m_particlesManager.SetPartHaste(true);
+			m_particlesManager.SetPartHasteCD(true);
 
 			Invoke("resetSpeed", 6f);
 			Invoke("cooldownHaste", 12f);
@@ -200,16 +199,16 @@ namespace CMF
 
 		void cooldownDash()
 		{
-			partDash.SetActive(true);
+			m_particlesManager.SetPartDash(true);
 			canDash = true;
 		}
 		void cooldownHaste()
 		{
-			partHasteCD.SetActive(false);
+			m_particlesManager.SetPartHasteCD(false);
 		}
 		void resetSpeed()
 		{
-			partHaste.SetActive(false);
+			m_particlesManager.SetPartHaste(false);
 			movementSpeed = 7f;
 		}
 
@@ -798,9 +797,9 @@ namespace CMF
 					mats[1] = bodymat;
 					mat.materials = mats;
 
-					partDash.SetActive(false);
-					partHaste.SetActive(true);
-					partHasteCD.SetActive(false);
+					m_particlesManager.SetPartDash(false);
+					m_particlesManager.SetPartHaste(true);
+					m_particlesManager.SetPartHasteCD(false);
 					canDash = false;
 
 					movementSpeed = 14f;
