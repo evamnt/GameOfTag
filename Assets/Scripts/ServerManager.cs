@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using TMPro;
+using System.Net;
+using System.Linq;
 
 public class ServerManager : NetworkBehaviour
 {
@@ -20,8 +22,9 @@ public class ServerManager : NetworkBehaviour
     public GameObject m_playerPrefab;
 
     [Header("Texts")]
-    public GameObject m_warningName;
+    public GameObject m_warningMsg;
     public TMP_Text m_name;
+    public TMP_Text m_ipAddress;
 
     [Header("Games Infos")]
     public Transform m_spawnPositions;
@@ -57,7 +60,7 @@ public class ServerManager : NetworkBehaviour
     }
     private void Start()
     {
-        m_warningName.SetActive(false);
+        m_warningMsg.SetActive(false);
         m_chooseModeUI.SetActive(true);
         m_serverUI.SetActive(false);
         m_clientUI.SetActive(false);
@@ -88,14 +91,53 @@ public class ServerManager : NetworkBehaviour
 
     private bool CheckNickname()
     {
-        if (m_name.text.Length <= 1)
+        string nickname = m_name.text.Remove(m_name.text.Length - 1);
+        if (string.IsNullOrEmpty(nickname))
         {
-            m_warningName.SetActive(true);
+            m_warningMsg.SetActive(true);
+            m_warningMsg.GetComponent<TMP_Text>().text = "Please enter a nickname";
             return false;
         }
         else
         {
             return true;
+        }
+    }
+
+    private bool CheckIPAddress()
+    {
+        string ipString = m_ipAddress.text.Remove(m_ipAddress.text.Length - 1);
+        if (string.IsNullOrEmpty(ipString))
+        {
+            m_warningMsg.SetActive(true);
+            m_warningMsg.GetComponent<TMP_Text>().text = "Please enter a IPv4";
+            return false;
+        }
+
+        //The only different format that we accept is "localhost"
+        if (ipString.ToLower() == "localhost")
+        {
+            m_ipAddress.text = ipString.ToLower();
+            return true;
+        }
+
+        string[] splitValues = ipString.Split('.');
+        if (splitValues.Length != 4)
+        {
+            m_warningMsg.SetActive(true);
+            m_warningMsg.GetComponent<TMP_Text>().text = "A valid IPv4 address contains 4 short int values separated by '.' characters";
+            return false;
+        }
+
+        byte tempForParsing;
+        if (splitValues.All(r => byte.TryParse(r, out tempForParsing))) {
+            return true;
+        }
+        else
+        {
+            m_warningMsg.SetActive(true);
+            m_warningMsg.GetComponent<TMP_Text>().text = "A valid IPv4 address contains only short int values";
+            return false;
         }
     }
 
@@ -115,38 +157,52 @@ public class ServerManager : NetworkBehaviour
         m_playersNb.text = clientNum + " / " + m_connectedPlayersTextBoxes.Count;
     }
 
+    private void UpdateIPAddress()
+    {
+        NetworkManager.Singleton.gameObject.GetComponent<Unity.Netcode.Transports.UNET.UNetTransport>().ConnectAddress = m_ipAddress.text.Remove(m_ipAddress.text.Length - 1);
+    }
+
     public void ButtonHost()
     {
-        if (CheckNickname())
+        if (CheckIPAddress())
         {
-            NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
-            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(m_name.text);
-            NetworkManager.Singleton.OnClientDisconnectCallback += DisconnectionCallback;
-            m_creatingHost = true;
-            if (NetworkManager.Singleton.StartHost())
+            if (CheckNickname())
             {
-                m_chooseModeUI.SetActive(false);
-                m_serverUI.SetActive(true);
+                NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
+                NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(m_name.text);
+                NetworkManager.Singleton.OnClientDisconnectCallback += DisconnectionCallback;
+                m_creatingHost = true;
 
-                //We have instantiated the host, now we wait for clients
-                m_creatingHost = false;
+                UpdateIPAddress();
+                if (NetworkManager.Singleton.StartHost())
+                {
+                    m_chooseModeUI.SetActive(false);
+                    m_serverUI.SetActive(true);
+
+                    //We have instantiated the host, now we wait for clients
+                    m_creatingHost = false;
+                }
             }
         }
     }
 
     public void ButtonClient()
     {
-        if (CheckNickname())
+        if (CheckIPAddress())
         {
-            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(m_name.text);
-            m_creatingHost = false;
-            if (NetworkManager.Singleton.StartClient())
+            if (CheckNickname())
             {
-                m_chooseModeUI.SetActive(false);
-                m_clientUI.SetActive(true);
+                NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(m_name.text);
+                m_creatingHost = false;
+
+                UpdateIPAddress();
+                if (NetworkManager.Singleton.StartClient())
+                {
+                    m_chooseModeUI.SetActive(false);
+                    m_clientUI.SetActive(true);
+                }
             }
         }
-        
     }
 
     public void ButtonStartGame()
