@@ -183,7 +183,8 @@ namespace CMF
 			}
         }
 
-		void Haste()
+		[ClientRpc]
+		public void HasteClientRpc()
 		{
 			CancelInvoke("cooldownHaste");
 			CancelInvoke("resetSpeed");
@@ -846,15 +847,14 @@ namespace CMF
 			}
 			else if(other.tag == "Collectible")
             {
-				Collectible otherCollectible = other.GetComponent<Collectible>();
-
-				if (!otherCollectible.visible) return;
-
-				otherCollectible.setVisible(false);
-				otherCollectible.callingVisibleFunc(true, 5f);
-
-				Haste();
+				NotifyCollectibleTouchServerRpc(other.GetComponent<NetworkObject>().NetworkObjectId, NetworkManager.Singleton.LocalClientId);
 			}
 		}
+
+		[ServerRpc]
+		void NotifyCollectibleTouchServerRpc(ulong collectibleId, ulong clientId)
+        {
+			NetworkManager.Singleton.SpawnManager.SpawnedObjects[collectibleId].gameObject.GetComponent<Collectible>().NotifyPlayerTouch(clientId);
+        }
 	}
 }

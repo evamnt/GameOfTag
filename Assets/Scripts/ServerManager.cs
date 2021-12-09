@@ -28,6 +28,7 @@ public class ServerManager : NetworkBehaviour
 
     [Header("Games Infos")]
     public Transform m_spawnPositions;
+    public BonusManager m_bonusManager;
     public EnvironmentSpawner m_environmentSpawner;
 
     [Header("Prefabs")]
@@ -227,6 +228,7 @@ public class ServerManager : NetworkBehaviour
         m_catManager = instantiatedCatManager.GetComponent<CatManager>();
         m_catManager.SetPlayerList(m_connectedPlayers);
         GameStarted = true;
+        m_bonusManager.enabled = true;
     }
 
     static void StatusLabels()
@@ -282,6 +284,21 @@ public class ServerManager : NetworkBehaviour
     public void Disconnect()
     {
         GameObject.FindObjectOfType<CMF.DemoMenu>().RestartScene();
+    }
+
+    public GameObject GetPlayerFromId(ulong clientId)
+    {
+        List<PlayerInfos> players = m_gamerules.GetAllConnectedPlayers();
+
+        foreach (PlayerInfos player in players)
+        {
+            if (player.clientId == clientId)
+            {
+                return player.instantiatedPlayer;
+            }
+        }
+
+        return null;
     }
 }
 
