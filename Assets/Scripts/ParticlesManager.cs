@@ -12,13 +12,16 @@ public class ParticlesManager : NetworkBehaviour
 
 	public void SetPartDash(bool enabled)
 	{
-		if (IsHost)
-		{
-			SetPartDashClientRpc(enabled);
-		}
-		else
-		{
-			SetPartDashServerRpc(enabled);
+		if (IsLocalPlayer)
+        {
+			if (IsHost)
+			{
+				SetPartDashClientRpc(enabled);
+			}
+			else
+			{
+				SetPartDashServerRpc(enabled);
+			}
 		}
 	}
 
@@ -36,13 +39,16 @@ public class ParticlesManager : NetworkBehaviour
 
 	public void SetPartHaste(bool enabled)
 	{
-		if (IsHost)
-		{
-			SetPartHasteClientRpc(enabled);
-		}
-		else
-		{
-			SetPartHasteServerRpc(enabled);
+		if (IsLocalPlayer)
+        {
+			if (IsHost)
+			{
+				SetPartHasteClientRpc(enabled);
+			}
+			else
+			{
+				SetPartHasteServerRpc(enabled);
+			}
 		}
 	}
 
@@ -60,13 +66,16 @@ public class ParticlesManager : NetworkBehaviour
 
 	public void SetPartHasteCD(bool enabled)
 	{
-		if (IsHost)
-		{
-			SetPartHasteCDClientRpc(enabled);
-		}
-		else
-		{
-			SetPartHasteCDServerRpc(enabled);
+		if (IsLocalPlayer)
+        {
+			if (IsHost)
+			{
+				SetPartHasteCDClientRpc(enabled);
+			}
+			else
+			{
+				SetPartHasteCDServerRpc(enabled);
+			}
 		}
 	}
 
