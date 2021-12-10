@@ -119,6 +119,7 @@ namespace CMF
         private void Start()
         {
 			setCat(timer.IsCat, firstAssignation);
+			if(!timer.IsCat) coll.enabled = false;
 		}
 
         //This function is called right after Awake(); It can be overridden by inheriting scripts;
