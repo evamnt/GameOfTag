@@ -227,6 +227,7 @@ public class ServerManager : NetworkBehaviour
         GameObject instantiatedCatManager = Instantiate(m_catManagerPrefab);
         m_catManager = instantiatedCatManager.GetComponent<CatManager>();
         m_catManager.SetPlayerList(m_connectedPlayers);
+        m_environmentSpawner.SpawnPrefabs();
         GameStarted = true;
         m_bonusManager.enabled = true;
     }

@@ -7,15 +7,12 @@ public class EnvironmentSpawner : NetworkBehaviour
 {
     public List<GameObject> m_startingPrefabs;
 
-    [ClientRpc]
-    public void InitializeEnvironmentClientRpc()
+    public void SpawnPrefabs()
     {
         foreach (GameObject prefab in m_startingPrefabs)
         {
             GameObject instantiatedObject = Instantiate(prefab, transform);
-            if (instantiatedObject.GetComponent<NetworkObject>() != null) {
-                instantiatedObject.GetComponent<NetworkObject>().Spawn();
-            }
+            instantiatedObject.GetComponent<NetworkObject>().Spawn();
         }
     }
 }

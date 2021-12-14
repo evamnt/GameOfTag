@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Netcode;
 
 namespace CMF
 {
 	//This script moves a rigidbody along a set of waypoints;
 	//It also moves any controllers on top along with it;
-	public class MovingPlatform : NetworkBehaviour {
+	public class MovingPlatform : MonoBehaviour {
 
 		//Movement speed;
 		public float movementSpeed = 10f;
@@ -29,10 +28,6 @@ namespace CMF
 		public List<Transform> waypoints = new List<Transform>();
 		int currentWaypointIndex = 0;
 		Transform currentWaypoint;
-
-		//Network variables
-		NetworkVariable<Vector3> m_networkMovement = new NetworkVariable<Vector3>();
-        NetworkVariable<Vector3> m_networkCurrentWaypoint = new NetworkVariable<Vector3>();
 
 		//Start;
 		void Start () {
@@ -75,43 +70,29 @@ namespace CMF
 			Vector3 _toCurrentWaypoint;
 			Vector3 _movement;
 
-			if (!IsHost)
-            {
-				currentWaypoint.position = m_networkCurrentWaypoint.Value;
-            }
-
 			//Calculate a vector to the current waypoint;
 			_toCurrentWaypoint = currentWaypoint.position - transform.position;
 
-			if (IsHost)
-            {
-				//If no waypoints have been assigned, return;
-				if(waypoints.Count <= 0)
-					return;
+			//If no waypoints have been assigned, return;
+			if(waypoints.Count <= 0)
+				return;
 
-				if(isWaiting)
-					return;
+			if(isWaiting)
+				return;
 
-				//Get normalized movement direction;
-				_movement = _toCurrentWaypoint.normalized;
+			//Get normalized movement direction;
+			_movement = _toCurrentWaypoint.normalized;
 
-				//Get movement for this frame;
-				_movement *= movementSpeed * Time.deltaTime;
-
-				m_networkMovement.Value = _movement;
-            }
-			else
-            {
-				_movement = m_networkMovement.Value;
-            }
+			//Get movement for this frame;
+			_movement *= movementSpeed * Time.deltaTime;
 
 			//If the remaining distance to the next waypoint is smaller than this frame's movement, move directly to next waypoint;
 			//Else, move toward next waypoint;
 			if (_movement.magnitude >= _toCurrentWaypoint.magnitude || _movement.magnitude == 0f)
 			{
 				r.transform.position = currentWaypoint.position;
-				if (IsHost)
-					UpdateWaypoint();
+				
+				UpdateWaypoint();
 			}
 			else
 			{
@@ -149,8 +130,6 @@ namespace CMF
 
 			//Stop platform movement;
 			isWaiting = true;
-
-			m_networkCurrentWaypoint.Value = currentWaypoint.position;
 		}
 
 		//Coroutine that keeps track of the wait time and sets 'isWaiting' back to 'false', after 'waitTime' has passed;

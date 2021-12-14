@@ -11144,7 +11144,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1000082349}
   - component: {fileID: 1000082350}
-  - component: {fileID: 1000082351}
   m_Layer: 0
   m_Name: Structures
   m_TagString: Untagged
@@ -11184,22 +11183,6 @@ MonoBehaviour:
   - {fileID: 3823788566217589367, guid: fcfa598ec0c514f4c8511a93fb9c9529, type: 3}
   - {fileID: 5199617796262626822, guid: 8776fbe6b2923484eab2ff80cc03c546, type: 3}
   - {fileID: 3801405331299985485, guid: 851e3314f58cad240b39c7b95a341bfb, type: 3}
---- !u!114 &1000082351
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000082348}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 880850249
-  AlwaysReplicateAsRoot: 0
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!4 &1009867506 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4298710278458246, guid: f557ed81f5649d640a89cc935866bedb, type: 3}
@@ -19389,6 +19372,21 @@ MonoBehaviour:
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
       Prefab: {fileID: 8298518361117613722, guid: 1f832865415d18441bd38eb0cb5ebdcd, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 3823788566217589367, guid: fcfa598ec0c514f4c8511a93fb9c9529, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 5199617796262626822, guid: 8776fbe6b2923484eab2ff80cc03c546, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 3801405331299985485, guid: 851e3314f58cad240b39c7b95a341bfb, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
