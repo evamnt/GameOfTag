@@ -48,10 +48,18 @@ public class ServerManager : NetworkBehaviour
     private TMP_Text m_playersNb;
     private List<PlayerInfos> m_connectedPlayers = new List<PlayerInfos>();
 
+    [Header("Music managment")]
+    public AudioSource m_menuMusic;
+    public AudioSource m_gameMusic;
+
     public bool GameStarted
     {
         get { return m_gameStarted; }
-        set { m_gameStarted = value; }
+        set { 
+            m_gameStarted = value;
+            m_menuMusic.Stop();
+            m_gameMusic.Play();
+        }
     }
 
     public bool GameFinished
